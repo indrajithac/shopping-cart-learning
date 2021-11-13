@@ -19,12 +19,18 @@
                         <a class="nav-link disabled">Orders</a>
                     </li>
                 </ul>
+                {{# if user}}
+                <a type="button" class="btn btn-light" role="button" href="/logout ">
+                    {{user.name}}-Log out
+                </a>
+                {{else}}
+                <a type="button" class="btn btn-light" role="button" href="/login">
+                   Log in
+                </a>
+                {{/if}}
                 
-                    <a type="button" class="btn btn-light" role="button" href="/login" >
-                        Log in
-                    </a>
-                    
-                
+
+
 
             </div>
 
