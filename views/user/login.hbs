@@ -6,6 +6,9 @@
             <h4 style="text-align: center;">Log in</h4>
 
             <form action="/login" method="post">
+            {{#if loginError}}
+            <p class="error" style="color: red;">{{loginError}}</p>
+            {{/if}}
 
                 <div class="form-group mt-3">
                     <input type="email" class="form-control" name="email" placeholder="Enter email">
