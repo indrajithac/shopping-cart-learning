@@ -15,8 +15,8 @@
                     <input type="text" class="form-control" name="category" value="{{product.category}}">
 
                     <label for="">Image</label><br>
-                    <img src="/product-images/{{product._id}}.jpg" style="height: auto; width:50px">
-                    <input type="file" class="form-control" name="image" >
+                    <img src="/product-images/{{product._id}}.jpg" style="height: auto; width:50px" id="imgView">
+                    <input type="file" class="form-control" name="image" onchange="viewImage(event)">
 
 
 
@@ -26,3 +26,8 @@
         </div>
     </div>
 </section>
+<script>
+    function viewImage(event){
+        document.getElementById('imgView').src=URL.createObjectURL(event.target.files[0])
+    }
+</script>

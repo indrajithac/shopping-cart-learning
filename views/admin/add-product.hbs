@@ -14,13 +14,18 @@
                     <input type="text" class="form-control" name="category">
 
                     <label for="">Image</label>
-                    <input type="file" class="form-control" name="image">
+                    <input type="file" class="form-control" name="image" onchange="viewImage(event)">
+                    <img src="/product-images/{{product._id}}.jpg" style="height: auto; width:50px" id="imgView">
 
-
-
+<br>
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
             </div>
         </div>
     </div>
 </section>
+<script>
+    function viewImage(event) {
+        document.getElementById('imgView').src = URL.createObjectURL(event.target.files[0])
+    }
+</script>
