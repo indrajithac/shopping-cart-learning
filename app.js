@@ -31,7 +31,7 @@ app.use(session({
   secret: "Key",
   saveUninitialized: true,
   cookie: { maxAge: 600000 },
-  resave: false
+  resave: true
 }))
 db.connect((err) => {
   if (err)
