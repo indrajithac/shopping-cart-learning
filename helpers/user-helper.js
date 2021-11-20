@@ -46,22 +46,40 @@ module.exports = {
         })
     },
     addToCart: (proId, userId) => {
+        let proObj = {
+            item: objectId(proId),
+            quantity: 1
+        }
+
         return new Promise(async (resolve, reject) => {
             let userCart = await db.get().collection(collection.CART_COLLECTION).findOne({ user: objectId(userId) })
             if (userCart) {
-                db.get().collection(collection.CART_COLLECTION).updateOne({ user: objectId(userId) },
-                    {
+                let proExists = userCart.product.findIndex(product => product.item == proId)
+                if (proExists != -1) {
+                    db.get().collection(collection.CART_COLLECTION).updateOne({ user: objectId(userId), 'product.item': objectId(proId) },
+                        {
+                            $inc: { 'product.$.quantity': 1 }
+                        }
+                    ).then(() => {
+                        resolve()
+                    })
 
-                        $push: { product: objectId(proId) }
+                } else {
+                    db.get().collection(collection.CART_COLLECTION).updateOne({ user: objectId(userId) },
+                        {
 
-                    }
-                ).then((response) => {
-                    resolve()
-                })
+                            $push: { product: proObj }
+
+                        }
+                    ).then((response) => {
+                        resolve()
+                    })
+
+                }
             } else {
                 let cartObj = {
                     user: objectId(userId),
-                    product: [objectId(proId)]
+                    product: [proObj]
                 }
                 db.get().collection(collection.CART_COLLECTION).insertOne(cartObj).then((response) => {
                     resolve()
@@ -76,6 +94,29 @@ module.exports = {
                     $match: { user: objectId(userId) }
                 },
                 {
+                    $unwind: '$product'
+                },
+                {
+                    $project: {
+                        item: '$product.item',
+                        quantity: '$product.quantity'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: collection.PRODUCT_COLLECTION,
+                        localField: 'item',
+                        foreignField: '_id',
+                        as: 'oneProduct'
+                    }
+                },
+                {
+                    $project: {
+                        item: 1, quantity: 1, oneProduct: { $arrayElemAt: ['$oneProduct', 0] }
+
+                    }
+                }
+                /*{
                     $lookup: {
                         from: collection.PRODUCT_COLLECTION,
                         let: { productList: '$product' },
@@ -90,13 +131,15 @@ module.exports = {
                         ],
                         as: 'cartItems'
                     }
-                }
+                }*/
+
             ]).toArray()
-            resolve(cartItems[0].cartItems)
+            //console.log(cartItems);
+            resolve(cartItems)
         })
     },
     getCartCount: (userId) => {
-        return new Promise(async(resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             let count = 0
             let cart = await db.get().collection(collection.CART_COLLECTION).findOne({ user: objectId(userId) })
             if (cart) {
@@ -104,5 +147,20 @@ module.exports = {
             }
             resolve(count)
         })
+    },
+    changeProductQuantity: (details) => {
+        //console.log(details);
+        details.count = parseInt(details.count)
+        return new Promise((resolve, reject) => {
+            db.get().collection(collection.CART_COLLECTION).updateOne({ _id: objectId(details.cart), 'product.item': objectId(details.oneProduct) },
+                {
+                    $inc: { 'product.$.quantity': details.count }
+                }
+            ).then(() => {                
+                resolve()
+            })
+
+        })
     }
+
 }
