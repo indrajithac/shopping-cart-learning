@@ -151,16 +151,28 @@ module.exports = {
     changeProductQuantity: (details) => {
         //console.log(details);
         details.count = parseInt(details.count)
-        return new Promise((resolve, reject) => {
-            db.get().collection(collection.CART_COLLECTION).updateOne({ _id: objectId(details.cart), 'product.item': objectId(details.oneProduct) },
-                {
-                    $inc: { 'product.$.quantity': details.count }
-                }
-            ).then(() => {                
-                resolve()
-            })
+        details.quantity = parseInt(details.quantity)
 
+        return new Promise((resolve, reject) => {
+            if (details.count == -1 && details.quantity == 1) {
+                db.get().collection(collection.CART_COLLECTION).updateOne({ _id: objectId(details.cart) },
+                    {
+                        $pull: { product: { item: objectId(details.oneProduct) } }
+                    }
+                ).then((response) => {
+
+                    resolve({ removeProduct: true })
+                })
+
+            } else {
+                db.get().collection(collection.CART_COLLECTION).updateOne({ _id: objectId(details.cart), 'product.item': objectId(details.oneProduct) },
+                    {
+                        $inc: { 'product.$.quantity': details.count }
+                    }
+                ).then((response) => {
+                    resolve(true)
+                })
+            }
         })
     }
-
 }
