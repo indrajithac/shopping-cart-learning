@@ -14,6 +14,9 @@
                     <label for="" class="form-label">Category</label>
                     <input type="text" class="form-control" name="category" value="{{product.category}}">
 
+                    <label for="" class="form-label">Price</label>
+                    <input type="text" class="form-control" name="price" value="{{product.price}}">
+
                     <label for="">Image</label><br>
                     <img src="/product-images/{{product._id}}.jpg" style="height: auto; width:50px" id="imgView">
                     <input type="file" class="form-control" name="image" onchange="viewImage(event)">

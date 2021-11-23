@@ -41,7 +41,8 @@ module.exports = {
                     $set: {
                         "name": proDetails.name,
                         "description": proDetails.description,
-                        "category": proDetails.category
+                        "category": proDetails.category,
+                        "price":proDetails.price
                     }
                 }
             ).then(() => {
