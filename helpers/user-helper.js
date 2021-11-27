@@ -134,7 +134,7 @@ module.exports = {
                 }*/
 
             ]).toArray()
-            //console.log(cartItems);
+            console.log(cartItems);
             resolve(cartItems)
         })
     },
@@ -175,17 +175,61 @@ module.exports = {
             }
         })
     },
-    removeProduct:(details)=>{
-        return new Promise((resolve ,reject)=>{
-             db.get().collection(collection.CART_COLLECTION).updateOne({ _id: objectId(details.cart) },
-                    {
-                        $pull: { product: { item: objectId(details.oneProduct) } }
-                    }
-                ).then((response) => {
+    removeProduct: (info) => {
+        return new Promise((resolve, reject) => {
+            db.get().collection(collection.CART_COLLECTION).updateOne({ _id: objectId(info.cart) },
+                {
+                    $pull: { product: { item: objectId(info.oneProduct) } }
+                }
+            ).then((response) => {
 
-                    resolve({ removeProduct: true })
-                })
+                resolve(true)
+            })
         })
-        
+
+    },
+    getTotalAmount: (userId) => {
+        return new Promise(async (resolve, reject) => {
+            let total = await db.get().collection(collection.CART_COLLECTION).aggregate([
+                {
+                    $match: { user: objectId(userId) }
+                },
+                {
+                    $unwind: '$product'
+                },
+                {
+                    $project: {
+                        item: '$product.item',
+                        quantity: '$product.quantity'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: collection.PRODUCT_COLLECTION,
+                        localField: 'item',
+                        foreignField: '_id',
+                        as: 'oneProduct'
+                    }
+                },
+                {
+                    $project: {
+                        item: 1, quantity: 1, oneProduct: { $arrayElemAt: ['$oneProduct', 0] }
+
+                    }
+                }, 
+                {
+                    $group:{
+                        _id:null,
+                        total: { $sum: { $multiply: [ {$convert:{input:"$oneProduct.price",to:"int"}}, "$quantity" ] } }
+                    }
+                }               
+
+                
+
+            ]).toArray()
+            //console.log(total[0]);
+            resolve(total[0].total)
+        })
+
     }
 }
