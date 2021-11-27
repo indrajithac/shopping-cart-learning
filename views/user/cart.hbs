@@ -19,10 +19,10 @@
 
                     <td>
                         <button class="cart-item-count mr-3 btn-secondary"
-                            onclick="changeQuantity('{{this._id}}','{{this.oneProduct._id}}',-1)">-</button>
+                            onclick="changeQuantity('{{this._id}}','{{this.oneProduct._id}}','{{../user._id}}',-1)">-</button>
                         <span id="{{this.oneProduct._id}}">{{this.quantity}}</span>
                         <button class="cart-item-count mr-3 btn-secondary"
-                            onclick="changeQuantity('{{this._id}}','{{this.oneProduct._id}}',1)">+</button>
+                            onclick="changeQuantity('{{this._id}}','{{this.oneProduct._id}}','{{../user._id}}',1)">+</button>
                     </td>
                     <td>
                         <button onclick="removeProduct('{{this._id}}','{{this.oneProduct._id}}')"
@@ -34,7 +34,7 @@
         </table>
         <hr>
         <div>
-            <h2 class="ml-5 mt-4">Total:Rs.</h2>
+            <h2 class="ml-5 mt-4">Total:Rs.<span id="total">{{totalValue}}</span></h2>
             <a href="/place-order" class="btn btn-success">Place Order</a>
 
         </div>
@@ -42,7 +42,7 @@
 </section>
 
 <script>
-    function changeQuantity(cartId, proId, count) {
+    function changeQuantity(cartId, proId,userId, count) {
         let quantity = parseInt(document.getElementById(proId).innerHTML)
         count = parseInt(count)
         $.ajax({
@@ -50,6 +50,7 @@
             data: {
                 cart: cartId,
                 oneProduct: proId,
+                user:userId,
                 count: count,
                 quantity: quantity
             },
@@ -60,6 +61,7 @@
                     location.reload()
                 } else {
                     document.getElementById(proId).innerHTML = quantity + count
+                    document.getElementById('total').innerHTML=response.total
                 }
 
             }

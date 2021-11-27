@@ -170,7 +170,7 @@ module.exports = {
                         $inc: { 'product.$.quantity': details.count }
                     }
                 ).then((response) => {
-                    resolve(true)
+                    resolve({status:true})
                 })
             }
         })
