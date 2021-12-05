@@ -109,5 +109,17 @@ router.post('/place-order',async(req,res)=>{
   })
   //console.log(req.body)
 })
+router.get('/order-success',verifyLogin,(req,res)=>{
+  res.render('user/order-success',{user:req.session.user})
+})
+router.get('/orders',verifyLogin,async(req,res)=>{
+  let orders=await userHelpers.getUserOrders(req.session.user._id)
+  //console.log(orders);
+  res.render('user/orders',{user:req.session.user,orders})
+})
+router.get('/view-order-products/:id',verifyLogin,async(req,res)=>{
+  let product=await userHelpers.getOrderProducts(req.params.id)
+  res.render('user/view-order-products',{user:req.session.user,product})
+})
 
 module.exports = router;
