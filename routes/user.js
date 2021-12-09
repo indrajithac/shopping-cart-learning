@@ -4,7 +4,7 @@ var router = express.Router();
 const productHelpers = require('../helpers/product-helpers')
 const userHelpers = require('../helpers/user-helper')
 const verifyLogin = (req, res, next) => {
-  if (req.session.user.loggedIn) {
+  if (req.session.userLoggedIn) {
     next()
 
   } else {
@@ -43,7 +43,7 @@ router.post('/signup', (req, res) => {
   userHelpers.doSignup(req.body).then((response) => {
     //console.log(response);
     req.session.user = response
-    req.session.user.loggedIn = true
+    req.session.userLoggedIn = true
 
     res.redirect('/')
 
@@ -54,7 +54,7 @@ router.post('/login', (req, res) => {
   userHelpers.doLogin(req.body).then((response) => {
     if (response.status) {
       req.session.user = response.user
-      req.session.user.loggedIn = true
+      req.session.userLoggedIn = true
 
       res.redirect('/')
     } else {
@@ -66,6 +66,7 @@ router.post('/login', (req, res) => {
 
 router.get('/logout', (req, res, next) => {
   req.session.user=null
+  req.session.userLoggedIn=false
   res.redirect('/')
 })
 
