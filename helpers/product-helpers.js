@@ -3,8 +3,49 @@ var collection = require('../config/collections')
 const { resolve, reject } = require('promise')
 var objectId = require('mongodb').ObjectID
 const { response } = require('express')
+const bcrypt = require('bcrypt')
+
 
 module.exports = {
+    doAdminSignup: (adminData) => {
+        return new Promise(async (resolve, reject) => {
+            adminData.password = await bcrypt.hash(adminData.password, 10)
+            db.get().collection(collection.ADMIN_COLLECTION).insertOne(adminData).then((data) => {
+                //console.log(data);
+                resolve(data.insertedId)
+            })
+
+
+        })
+    },
+    doAdminLogin:(adminData) => {
+        return new Promise(async (resolve, reject) => {
+            let loginStatus = false
+            let response = {}
+            let admin = await db.get().collection(collection.ADMIN_COLLECTION).findOne({ email: adminData.email })
+            if (admin) {
+                bcrypt.compare(adminData.password, admin.password).then((status) => {
+                    if (status) {
+                        console.log('login success');
+                        response.admin = admin
+                        response.status = true
+                        resolve(response)
+
+                    } else {
+                        console.log('wrong password');
+                        resolve({ status: false })
+
+                    }
+
+                })
+            } else {
+                console.log('email doesnt exist');
+                resolve({ status: false })
+
+            }
+        })
+    },
+
     addProduct: (product, callback) => {
         //console.log(product)
         db.get().collection('product').insertOne(product).then((data) => {
@@ -42,7 +83,7 @@ module.exports = {
                         "name": proDetails.name,
                         "description": proDetails.description,
                         "category": proDetails.category,
-                        "price":proDetails.price
+                        "price": proDetails.price
                     }
                 }
             ).then(() => {
