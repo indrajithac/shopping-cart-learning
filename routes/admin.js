@@ -12,17 +12,17 @@ const verifyLogin = (req, res, next) => {
 }
 
 /* GET users listing. */
-router.get('/',verifyLogin, function (req, res, next) {
-
-  productHelpers.getAllProducts().then((products)=>{
+router.get('/', verifyLogin, function (req, res, next) {
+  adminData = req.session.admin
+  productHelpers.getAllProducts().then((products) => {
     //console.log(products);
-  
-    res.render('admin/view-products', { admin: true, products})
+
+    res.render('admin/view-products', { admin: true, products, adminData })
   })
 });
 
-router.get('/sign-up',(req,res)=>{
-  res.render('admin/sign-up')
+router.get('/sign-up', (req, res) => {
+  res.render('admin/sign-up', { admin: true })
 })
 
 router.post('/sign-up', (req, res) => {
@@ -40,8 +40,7 @@ router.get('/log-in', (req, res, next) => {
   if (req.session.admin) {
     res.redirect('/admin')
   } else {
-
-    res.render('admin/log-in', { "loginError": req.session.adminLoginError })
+    res.render('admin/log-in', { "loginError": req.session.adminLoginError, admin: true })
     req.session.adminLoginError = false
   }
 })
@@ -60,8 +59,14 @@ router.post('/log-in', (req, res) => {
   })
 })
 
-router.get('/add-product', (req, res) => {
-  res.render('admin/add-product',{admin:true})
+router.get('/log-out', (req, res, next) => {
+  req.session.admin = null
+  req.session.adminLoggedIn = false
+  res.redirect('/admin')
+})
+
+router.get('/add-product', verifyLogin, (req, res) => {
+  res.render('admin/add-product', { admin: true })
 
 })
 router.post('/add-product', (req, res) => {
@@ -74,33 +79,33 @@ router.post('/add-product', (req, res) => {
     //console.log(result);
     image.mv('./public/product-images/' + result + '.jpg', (err, done) => {
       if (!err) {
-        res.render("admin/add-product",{admin:true})
+        res.render("admin/add-product", { admin: true })
       }
 
     })
 
   })
 })
-router.get('/delete-product/:id',(req,res)=>{
-      let proId=req.params.id 
-      //console.log(proId);
-      productHelpers.deleteProduct(proId).then((response)=>{
-        res.redirect('/admin/')
-      })
+router.get('/delete-product/:id', (req, res) => {
+  let proId = req.params.id
+  //console.log(proId);
+  productHelpers.deleteProduct(proId).then((response) => {
+    res.redirect('/admin/')
+  })
 })
-router.get('/edit-product/:id',async(req,res)=>{
-  let product=await productHelpers.getProductDetails(req.params.id)
+router.get('/edit-product/:id', async (req, res) => {
+  let product = await productHelpers.getProductDetails(req.params.id)
   console.log(product);
-  res.render('admin/edit-product',{product, admin:true})
+  res.render('admin/edit-product', { product, admin: true })
 })
-router.post('/edit-product/:id',(req,res)=>{
-  productHelpers.updateProduct(req.params.id, req.body).then(()=>{
+router.post('/edit-product/:id', (req, res) => {
+  productHelpers.updateProduct(req.params.id, req.body).then(() => {
     res.redirect('/admin')
-    if(req.files.image){
-      let id=req.params.id
+    if (req.files.image) {
+      let id = req.params.id
       //console.log(response);
-      let image=req.files.image
-      image.mv('./public/product-images/' + id + '.jpg')       
+      let image = req.files.image
+      image.mv('./public/product-images/' + id + '.jpg')
 
     }
   })

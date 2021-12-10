@@ -13,27 +13,39 @@
                         <a class="nav-link active" aria-current="page" href="/">Products</a>
                     </li>
                     <li class="nav">
-                        <a class="nav-link" href="/cart">Cart <span class="badge rounded-pill bg-success" id="cart-count">{{cartCount}}</span></a>
-                        
+                        <a class="nav-link" href="/cart">Cart <span class="badge rounded-pill bg-success"
+                                id="cart-count">{{cartCount}}</span></a>
+
                     </li>
                     {{#if user}}
                     <li class="nav">
                         <a class="nav-link" href="/orders">Orders</a>
                     </li>
+
                     {{/if}}
                 </ul>
-                {{#if user}}
-                <a type="button" class="btn btn-light" role="button" href="/logout ">
-                    {{user.name}}-Log out
-                </a>
-                {{else}}
-                <a type="button" class="btn btn-light" role="button" href="/login">
-                   Log in
-                </a>
-                {{/if}}
-                
+                <ul>
+                    <div class="dropdown dropstart">
+                        <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            {{#if user}}
+                            {{user.name}}
+                            {{else}}
+                            Options
+                            {{/if}}
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                            {{#if user}}
+                            <li><a class="dropdown-item" href="/logout "> Log out</a></li>
+                            {{else}}
+                            <li><a class="dropdown-item" href="/login"> Log in</a></li>
+                            <li><a class="dropdown-item" href="/admin/sign-up">Register as seller</a></li>
 
+                            {{/if}}
+                        </ul>
+                    </div>
 
+                </ul>
 
             </div>
 
