@@ -6,9 +6,10 @@ const { use } = require('../routes/user')
 var objectId = require('mongodb').ObjectID
 const { response } = require('express')
 const Razorpay = require('razorpay')
+require('dotenv').config()
 var instance = new Razorpay({
-    key_id: 'rzp_test_Tfxfnf6OZxRAxA',
-    key_secret: 'rotXwRtROgD5QFnNeX2CCjZ3',
+    key_id: process.env.KEY_ID,
+    key_secret: process.env.KEY_SECRET,
 });
 
 module.exports = {
